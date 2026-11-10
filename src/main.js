@@ -1,12 +1,11 @@
-async function searchCityInApi(city) {
-    const url = `https://geocoding-api.open-meteo.com/v1/search?name=${city}`;
-    const response = await fetch(url);
+import { CreateWeatherArticle } from "./components.js";
 
-    if (!response.ok) {
+async function getLongitudeAndLatitiude(city) {
+    const res = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${city}`);
+    if (!res.ok) {
         throw new Error('City search failed.');
     }
-
-    const data = await response.json();
+    const data = await res.json();
     return data.results || [];
 }
 
@@ -30,12 +29,18 @@ form.addEventListener('submit', async (e) => {
     results.textContent = 'Loading…';
 
     try {
-        const cities = await searchCityInApi(query);
+        const cities = await getLongitudeAndLatitiude(query);
         if (!cities.length) {
             results.textContent = '';
             errorMessage.textContent = 'City not found.';
             return;
         }
+        const city = cities[0];
+
+        let res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${city.latitude}&longitude=${city.longitude}&current=temperature_2m,relative_humidity_2m,apparent_temperature,wind_speed_10m,weather_code`);
+        const data = await res.json();
+
+        document.body.appendChild(CreateWeatherArticle(data, city));
         results.textContent = 'City found!';
     } catch (error) {
         results.textContent = '';
@@ -43,3 +48,4 @@ form.addEventListener('submit', async (e) => {
         console.error(error);
     }
 });
+
