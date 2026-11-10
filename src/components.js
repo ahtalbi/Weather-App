@@ -56,17 +56,9 @@ export function CreateWeatherArticle(data, city) {
     cityTitle.classList.add("text-3xl", "font-bold");
     cityTitle.textContent = city.name;
 
-    const location = document.createElement("p");
-    location.classList.add("text-sm", "text-blue-100");
-    location.textContent = `${city.admin1 || ""}, ${city.country || ""}`;
-
-    const cityHeader = document.createElement("header");
-    cityHeader.append(cityTitle, location);
-
     const temperature = document.createElement("p");
-    temperature.classList.add("text-7xl", "font-light");
-    temperature.textContent =
-        `${Math.round(current.temperature_2m)}${units.temperature_2m}`;
+    temperature.classList.add("text-6xl", "font-light");
+    temperature.textContent = `${Math.round(current.temperature_2m)}${units.temperature_2m}`;
 
     const icon = document.createElement("span");
     icon.classList.add("text-7xl");
@@ -77,23 +69,23 @@ export function CreateWeatherArticle(data, city) {
         "flex",
         "items-center",
         "justify-between",
-        "py-8"
+        "gap-4",
+        "py-6"
     );
 
     const weatherInfo = document.createElement("div");
-    weatherInfo.append(
-        temperature,
-        document.createTextNode(weather.label)
-    );
+    const descriptionTitle = document.createElement("p");
+    descriptionTitle.classList.add("mt-3", "text-sm", "font-medium", "text-blue-100");
+    descriptionTitle.textContent = "Description";
+    const weatherDescription = document.createElement("p");
+    weatherDescription.classList.add("mt-1", "text-lg", "font-semibold", "text-white");
+    weatherDescription.textContent = weather.label;
+    weatherInfo.append(temperature, descriptionTitle, weatherDescription);
 
     weatherSection.append(weatherInfo, icon);
 
-    const feelsLike = document.createElement("p");
-    feelsLike.classList.add("text-sm", "text-blue-100");
-    feelsLike.textContent = `Feels like ${current.apparent_temperature}${units.apparent_temperature}`;
-
     const details = document.createElement("section");
-    details.classList.add("grid", "grid-cols-2", "gap-3", "mt-6");
+    details.classList.add("grid", "grid-cols-2", "gap-3", "mt-2");
 
     const createDetail = (emoji, label, value) => {
         const card = document.createElement("div");
@@ -112,29 +104,11 @@ export function CreateWeatherArticle(data, city) {
     };
 
     details.append(
-        createDetail(
-            "💧",
-            "Humidity",
-            `${current.relative_humidity_2m}${units.relative_humidity_2m}`
-        ),
-        createDetail(
-            "💨",
-            "Wind speed",
-            `${current.wind_speed_10m} ${units.wind_speed_10m}`
-        ),
-        createDetail(
-            "⛰️",
-            "Elevation",
-            `${data.elevation} m`
-        ),
-        createDetail(
-            "🕒",
-            "Local time",
-            current.time.replace("T", " ")
-        )
+        createDetail("💧", "Humidité", `${current.relative_humidity_2m}${units.relative_humidity_2m}`),
+        createDetail("💨", "Vent", `${current.wind_speed_10m} ${units.wind_speed_10m}`)
     );
 
-    article.append(cityHeader, weatherSection, feelsLike, details);
+    article.append(cityTitle, weatherSection, details);
 
     return article;
 }
