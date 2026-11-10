@@ -1,16 +1,36 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.png" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>weather-app</title>
+    <title>Weather App</title>
+    <link rel="stylesheet" href="src/style.css">
 </head>
 
 <body>
-
-    <script type="module" src="/src/main.js"></script>
+    <header class="flex w-full items-center justify-between border-b border-slate-200 bg-white px-[7%] py-3">
+        <a class="flex items-center gap-3 text-slate-800 no-underline" href="#home">
+            <img class="h-11 w-11 object-contain" src="/favicon.png" alt="" />
+            <h1 class="m-0 text-[21px] font-semibold">Weather App</h1>
+        </a>
+        <nav class="flex items-center gap-6 max-sm:gap-3">
+        </nav>
+    </header>
+    <main class="flex min-h-screen justify-center bg-slate-50 px-5 pt-18" id="home">
+        <section class="flex w-full max-w-190 flex-col items-center text-center" id="weather">
+            <h2 class="mb-3 mt-0 text-4xl font-semibold text-slate-800 max-sm:text-[29px]">Check the weather</h2>
+            <p id="search-status" class="mb-7.5 mt-0 text-base text-slate-500">Find the current weather for any city.</p>
+            <form id="city-search" class="flex w-full max-w-155 items-center gap-2 rounded-lg border border-slate-200 bg-white p-2" role="search">
+                <input id="city-input" class="min-w-0 flex-1 border-0 p-3 text-slate-800 outline-none" type="search" name="city" placeholder="Search for a city"/>
+                <button class="cursor-pointer rounded-md border-0 bg-blue-600 px-5.5 py-3 text-white max-sm:px-3.5 type="submit">Search</button>
+            </form>
+            <h2 id="error-message" class="text-red-600" role="alert"></h2>
+            <h1 id="succeded-results"></h1>
+        </section>
+    </main>
+    <script type="module" src="./src/main.js"></script>
 </body>
 
 </html>
