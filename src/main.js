@@ -13,6 +13,7 @@ const form = document.querySelector('#city-search');
 const input = document.querySelector('#city-input');
 const errorMessage = document.querySelector('#error-message');
 const results = document.querySelector('#succeded-results');
+const weatherResult = document.querySelector('#weather-result');
 
 form.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -40,8 +41,8 @@ form.addEventListener('submit', async (e) => {
         let res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${city.latitude}&longitude=${city.longitude}&current=temperature_2m,relative_humidity_2m,apparent_temperature,wind_speed_10m,weather_code`);
         const data = await res.json();
 
-        document.body.appendChild(CreateWeatherArticle(data, city));
-        results.textContent = 'City found!';
+        weatherResult.replaceChildren(CreateWeatherArticle(data, city));
+        results.textContent = '';
     } catch (error) {
         results.textContent = '';
         errorMessage.textContent = 'Something went wrong. Please try again.';
