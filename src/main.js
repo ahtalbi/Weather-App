@@ -1,4 +1,4 @@
-import { CreateWeatherArticle } from "./components.js";
+import { CreateWeatherArticle, CreateForecastCards } from "./components.js";
 
 async function getLongitudeAndLatitiude(city) {
     const res = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${city}`);
@@ -7,6 +7,15 @@ async function getLongitudeAndLatitiude(city) {
     }
     const data = await res.json();
     return data.results || [];
+}
+
+async function GetWeatherBytime(infos) {
+    const { latitude, longitude } = infos;
+    const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max&forecast_days=6&timezone=auto`);
+    if (!res.ok) {
+        throw new Error('Weather forecast request failed.');
+    }
+    return await res.json();
 }
 
 const form = document.querySelector('#city-search');
@@ -38,10 +47,15 @@ form.addEventListener('submit', async (e) => {
         }
         const city = cities[0];
 
-        let res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${city.latitude}&longitude=${city.longitude}&current=temperature_2m,relative_humidity_2m,apparent_temperature,wind_speed_10m,weather_code`);
-        const data = await res.json();
+        const data = await GetWeatherBytime({
+            latitude: city.latitude,
+            longitude: city.longitude,
+        });
 
-        weatherResult.replaceChildren(CreateWeatherArticle(data, city));
+        weatherResult.replaceChildren(
+            CreateWeatherArticle(data, city),
+            CreateForecastCards(data)
+        );
         results.textContent = '';
     } catch (error) {
         results.textContent = '';
@@ -49,4 +63,3 @@ form.addEventListener('submit', async (e) => {
         console.error(error);
     }
 });
-
