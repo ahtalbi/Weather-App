@@ -43,18 +43,28 @@ export function CreateWeatherArticle(data, city) {
     article.classList.add(
         "w-full",
         "max-w-md",
+        "mx-auto",
         "rounded-3xl",
         "bg-gradient-to-br",
         "from-sky-500",
         "to-blue-700",
         "p-7",
         "text-white",
-        "shadow-xl"
+        "shadow-xl",
+        "text-center"
     );
 
     const cityTitle = document.createElement("h2");
     cityTitle.classList.add("text-3xl", "font-bold");
     cityTitle.textContent = city.name;
+
+    const today = document.createElement("p");
+    today.classList.add("mt-1", "text-blue-100");
+    const date = new Date(data.current?.time);
+
+    today.textContent = data.current?.time
+        ? `Aujourd’hui · ${date.getDate()} ${["janvier", "février", "mars", "avril", "mai", "juin", "juillet", "août", "septembre", "octobre", "novembre", "décembre"][date.getMonth()]}`
+        : "Aujourd’hui";
 
     const temperature = document.createElement("p");
     temperature.classList.add("text-6xl", "font-light");
@@ -68,12 +78,13 @@ export function CreateWeatherArticle(data, city) {
     weatherSection.classList.add(
         "flex",
         "items-center",
-        "justify-between",
+        "justify-center",
         "gap-4",
         "py-6"
     );
 
     const weatherInfo = document.createElement("div");
+    weatherInfo.classList.add("text-center");
     const descriptionTitle = document.createElement("p");
     descriptionTitle.classList.add("mt-3", "text-sm", "font-medium", "text-blue-100");
     descriptionTitle.textContent = "Description";
@@ -89,7 +100,7 @@ export function CreateWeatherArticle(data, city) {
 
     const createDetail = (emoji, label, value) => {
         const card = document.createElement("div");
-        card.classList.add("rounded-2xl", "bg-white/15", "p-4");
+        card.classList.add("rounded-2xl", "bg-white/15", "p-4", "text-center");
 
         const heading = document.createElement("p");
         heading.classList.add("text-sm", "text-blue-100");
@@ -108,7 +119,59 @@ export function CreateWeatherArticle(data, city) {
         createDetail("💨", "Vent", `${current.wind_speed_10m} ${units.wind_speed_10m}`)
     );
 
-    article.append(cityTitle, weatherSection, details);
+    article.append(cityTitle, today, weatherSection, details);
 
     return article;
+}
+
+export function CreateForecastCards(data) {
+    const section = document.createElement("section");
+    section.classList.add("mt-8", "w-full");
+
+    const title = document.createElement("h2");
+    title.classList.add("mb-5", "text-left", "text-2xl", "font-bold", "tracking-tight", "text-slate-800");
+    title.textContent = "Les 5 prochains jours";
+    section.append(title);
+
+    const grid = document.createElement("div");
+    grid.classList.add("grid", "grid-cols-1", "gap-4", "sm:grid-cols-2", "md:grid-cols-3", "xl:grid-cols-5");
+
+    const daily = data.daily;
+    if (!daily?.time?.length) {
+        const missing = document.createElement("p");
+        missing.classList.add("rounded-xl", "bg-white", "p-4", "text-slate-500");
+        missing.textContent = "Prévisions indisponibles.";
+        section.append(missing);
+        return section;
+    }
+
+    for (let index = 1; index < daily.time.length; index++) {
+        const date = daily.time[index].split("-").reverse().join("/");
+        const weather = WEATHER_CODES[daily.weather_code?.[index]] || { label: "Donnée indisponible", icon: "🌡️" };
+        const card = document.createElement("article");
+        card.classList.add("group", "relative", "flex", "min-h-52", "flex-col", "items-center", "overflow-hidden", "rounded-3xl", "bg-gradient-to-br", "from-sky-500", "to-blue-700", "p-5", "text-center", "text-white", "shadow-lg", "transition", "duration-200", "hover:-translate-y-1", "hover:shadow-xl");
+
+        const dateHeading = document.createElement("h3");
+        dateHeading.classList.add("text-sm", "font-semibold", "tracking-wide", "text-blue-100");
+        dateHeading.textContent = date;
+
+        const icon = document.createElement("p");
+        icon.classList.add("my-3", "flex", "h-16", "w-16", "items-center", "justify-center", "rounded-full", "bg-white/15", "text-4xl", "transition", "group-hover:scale-110");
+        icon.textContent = weather.icon;
+        const description = document.createElement("p");
+        description.classList.add("text-base", "font-semibold", "text-white");
+        description.textContent = weather.label;
+        const temperature = document.createElement("p");
+        temperature.classList.add("mt-3", "text-xl", "font-bold", "tracking-tight", "text-white");
+        temperature.textContent = `${Math.round(daily.temperature_2m_min[index])}°  /  ${Math.round(daily.temperature_2m_max[index])}°C`;
+        const rain = document.createElement("p");
+        rain.classList.add("mt-3", "rounded-full", "bg-white/15", "px-3", "py-1.5", "text-xs", "font-medium", "text-blue-50");
+        rain.textContent = `💧 Risque de pluie : ${daily.precipitation_probability_max[index]}%`;
+
+        card.append(dateHeading, icon, description, temperature, rain);
+        grid.append(card);
+    }
+
+    section.append(grid);
+    return section;
 }
